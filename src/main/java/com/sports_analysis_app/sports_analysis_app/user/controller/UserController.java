@@ -1,13 +1,12 @@
 package com.sports_analysis_app.sports_analysis_app.user.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.sports_analysis_app.sports_analysis_app.user.entity.User;
-import com.sports_analysis_app.sports_analysis_app.user.repository.UserRepository;
+import com.sports_analysis_app.sports_analysis_app.user.service.UserService;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,15 +18,20 @@ import org.springframework.web.bind.annotation.PathVariable;
 @RequestMapping("/api/users")
 public class UserController {
     @Autowired
-    private UserRepository repository;
+    private UserService service;
 
     @PostMapping
     public User postMethodName(@RequestBody User user) {
-        return repository.save(user);
+        return service.createUser(user.getEmail(), user.getName());
     }
 
     @GetMapping("/{id}")
     public User getUser(@PathVariable Long id) {
-        return repository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        return service.getUserById(id);
+    }
+
+    @GetMapping("/{email}")
+    public User getUser(@PathVariable String email) {
+        return service.getUserByEmail(email);
     }
 }
