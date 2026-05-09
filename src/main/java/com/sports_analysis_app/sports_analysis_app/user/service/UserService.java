@@ -1,10 +1,12 @@
 package com.sports_analysis_app.sports_analysis_app.user.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.sports_analysis_app.sports_analysis_app.user.entity.User;
 import com.sports_analysis_app.sports_analysis_app.user.repository.UserRepository;
 
+@Service
 public class UserService {
     @Autowired
     private UserRepository userRepository;
