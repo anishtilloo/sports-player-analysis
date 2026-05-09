@@ -1,4 +1,4 @@
-package com.sports_analysis_app.sports_analysis_app.util;
+package com.sports_analysis_app.sports_analysis_app.security;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -13,10 +13,10 @@ import javax.crypto.SecretKey;
 
 @Component
 public class JwtUtil {
-    @Value("${jwt.secret:change_this_in_prod}")
+    @Value("${jwt.secret}")
     private String secret;
 
-    @Value("${jwt.token_expiration:86400000}") // for 24 hours
+    @Value("${jwt.token_expiration}") // for 24 hours
     private long expiration;
 
     public String generateToken(String email, Long userId) {
