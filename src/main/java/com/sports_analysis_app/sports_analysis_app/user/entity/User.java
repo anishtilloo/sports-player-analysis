@@ -28,6 +28,14 @@ public class User {
     @Column(nullable = false,  name = "updated_at")
     private Long updatedAt;
 
+    public User(String name, String email, String password, Long createdAt, Long updatedAt) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
+
     // Setters
     public void setName(String name) { this.name = name; }
     public void setEmail(String email) { this.email = email; }
@@ -36,6 +44,7 @@ public class User {
     public void setUpdatedAt(Long updatedAt) { this.updatedAt = updatedAt; }
     
     // Getters
+    public Long getId() { return id; }
     public String getName() { return name; }
     public String getEmail() { return email; }
     public String getPassword() { return password; }
