@@ -28,6 +28,9 @@ public class User {
     @Column(nullable = false,  name = "updated_at")
     private Long updatedAt;
 
+    // When we use a parameterized constructor Hibernate stops using the default constructor so we have to specifically define it
+    public User() {}
+
     public User(String name, String email, String password, Long createdAt, Long updatedAt) {
         this.name = name;
         this.email = email;
