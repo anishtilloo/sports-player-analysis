@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/auth")
 public class UserController {
 
     @Autowired
@@ -34,7 +34,7 @@ public class UserController {
         return service.loginUser(request.getEmail(), request.getPassword());
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/me/{id}")
     public User getUser(@PathVariable Long id) {
         return service.getUserById(id);
     }
