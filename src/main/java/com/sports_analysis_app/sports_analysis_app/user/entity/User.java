@@ -19,13 +19,28 @@ public class User {
     @Column(nullable = false)
     private String email;
 
+    @Column(nullable = false)
+    private String password;
+    
+    @Column(nullable = false,  name = "created_at")
+    private Long createdAt;
+
+    @Column(nullable = false,  name = "updated_at")
+    private Long updatedAt;
+
     // Setters
     public void setName(String name) { this.name = name; }
     public void setEmail(String email) { this.email = email; }
+    public void setPassword(String password) { this.password = password; }
+    public void setCreatedAt(Long createdAt) { this.createdAt = createdAt; }
+    public void setUpdatedAt(Long updatedAt) { this.updatedAt = updatedAt; }
     
     // Getters
     public String getName() { return name; }
     public String getEmail() { return email; }
+    public String getPassword() { return password; }
+    public Long getCreatedAt() { return createdAt; }
+    public Long getUpdatedAt() { return updatedAt; }
 
 
     @Override
