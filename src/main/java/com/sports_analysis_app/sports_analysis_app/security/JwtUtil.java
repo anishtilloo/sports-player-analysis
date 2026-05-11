@@ -13,13 +13,13 @@ import javax.crypto.SecretKey;
 
 @Component
 public class JwtUtil {
-    @Value("${jwt.access_token_expiration}")
+    @Value("${jwt.access_token_secret}")
     private String accessTokenSecret;
 
-        @Value("${jwt.refresh_token_expiration}")
+    @Value("${jwt.refresh_token_secret}")
     private String refreshTokenSecret;
 
-    @Value("${jwt.token_expiration}") // for 24 hours
+    @Value("${jwt.access_token_expiration}") // for 24 hours
     private long expiration;
 
     @Value("${jwt.refresh_token_expiration}") // for 1 month
