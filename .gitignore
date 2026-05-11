@@ -37,4 +37,4 @@ build/
 /postman
 
 ## Application Properties ##
-/src/main/resources/*.properties
+src/main/resources/application.properties
