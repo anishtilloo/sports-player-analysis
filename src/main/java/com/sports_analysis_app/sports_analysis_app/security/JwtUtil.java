@@ -13,14 +13,20 @@ import javax.crypto.SecretKey;
 
 @Component
 public class JwtUtil {
-    @Value("${jwt.secret}")
-    private String secret;
+    @Value("${jwt.access_token_expiration}")
+    private String accessTokenSecret;
+
+        @Value("${jwt.refresh_token_expiration}")
+    private String refreshTokenSecret;
 
     @Value("${jwt.token_expiration}") // for 24 hours
     private long expiration;
 
-    public String generateToken(String email, Long userId) {
-        SecretKey key = Keys.hmacShaKeyFor(secret.getBytes());
+    @Value("${jwt.refresh_token_expiration}") // for 1 month
+    private long refreshTokenExpiration;
+
+    public String generateAccessToken(String email, Long userId) {
+        SecretKey key = Keys.hmacShaKeyFor(accessTokenSecret.getBytes());
         return Jwts.builder()
             .setSubject(email)
             .claim("userId", userId)
@@ -30,8 +36,19 @@ public class JwtUtil {
             .compact();
     }
 
-    public String extractEmail(String token) {
-        SecretKey key = Keys.hmacShaKeyFor(secret.getBytes());
+    public String generateRefreshToken(String email, Long userId) {
+        SecretKey key = Keys.hmacShaKeyFor(refreshTokenSecret.getBytes());
+        return Jwts.builder()
+            .setSubject(email)
+            .claim("userId", userId)
+            .setIssuedAt(new Date())
+            .setExpiration(new Date(System.currentTimeMillis() + refreshTokenExpiration))
+            .signWith(key, SignatureAlgorithm.HS256)
+            .compact();
+    }
+
+    public String extractEmailFromAccessToken(String token) {
+        SecretKey key = Keys.hmacShaKeyFor(accessTokenSecret.getBytes());
         return Jwts.parserBuilder()
             .setSigningKey(key)
             .build()
@@ -40,8 +57,18 @@ public class JwtUtil {
             .getSubject();
     }
 
-    public Long extractUserId(String token) {
-        SecretKey key = Keys.hmacShaKeyFor(secret.getBytes());
+    public String extractEmailFromRefreshToken(String token) {
+        SecretKey key = Keys.hmacShaKeyFor(refreshTokenSecret.getBytes());
+        return Jwts.parserBuilder()
+            .setSigningKey(key)
+            .build()
+            .parseClaimsJws(token)
+            .getBody()
+            .getSubject();
+    }
+
+    public Long extractUserIdFromAccessToken(String token) {
+        SecretKey key = Keys.hmacShaKeyFor(accessTokenSecret.getBytes());
         return ((Number) Jwts.parserBuilder()
             .setSigningKey(key)
             .build()
@@ -50,9 +77,32 @@ public class JwtUtil {
             .get("userId")).longValue();
     }
 
-    public boolean validateToken(String token) {
+    public Long extractUserIdFromRefreshToken(String token) {
+        SecretKey key = Keys.hmacShaKeyFor(refreshTokenSecret.getBytes());
+        return ((Number) Jwts.parserBuilder()
+            .setSigningKey(key)
+            .build()
+            .parseClaimsJws(token)
+            .getBody()
+            .get("userId")).longValue();
+    }
+
+    public boolean validateAccessToken(String token) {
         try {
-            SecretKey key = Keys.hmacShaKeyFor(secret.getBytes());
+            SecretKey key = Keys.hmacShaKeyFor(accessTokenSecret.getBytes());
+            Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean validateRefreshToken(String token) {
+        try {
+            SecretKey key = Keys.hmacShaKeyFor(refreshTokenSecret.getBytes());
             Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()

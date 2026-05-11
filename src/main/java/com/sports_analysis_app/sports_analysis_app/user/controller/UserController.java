@@ -8,6 +8,7 @@ import com.sports_analysis_app.sports_analysis_app.user.entity.User;
 import com.sports_analysis_app.sports_analysis_app.user.dto.RegisterRequest;
 import com.sports_analysis_app.sports_analysis_app.user.dto.AuthResponse;
 import com.sports_analysis_app.sports_analysis_app.user.dto.LoginRequest;
+import com.sports_analysis_app.sports_analysis_app.user.dto.RefreshRequest;
 import com.sports_analysis_app.sports_analysis_app.user.service.UserService;
 
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,6 +33,11 @@ public class UserController {
     @PostMapping("/login")
     public AuthResponse login(@RequestBody LoginRequest request) {
         return service.loginUser(request.getEmail(), request.getPassword());
+    }
+
+    @PostMapping("/refresh")
+    public AuthResponse login(@RequestBody RefreshRequest request) {
+        return service.refreshUserSession(request.getRefreshToken());
     }
 
     @GetMapping("/me/{id}")

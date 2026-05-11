@@ -35,3 +35,6 @@ build/
 ### Postman ###
 .postman/
 /postman
+
+## Application Properties ##
+/src/main/resources/*.properties

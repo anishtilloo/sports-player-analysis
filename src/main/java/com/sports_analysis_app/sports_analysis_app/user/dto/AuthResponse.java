@@ -2,13 +2,15 @@ package com.sports_analysis_app.sports_analysis_app.user.dto;
 
 public class AuthResponse {
     private Long userId;
-    private String token;
+    private String accessToken;
+    private String refreshToken;
     private String email;
     private String message;
 
-    public AuthResponse(Long userId, String token, String email, String message) {
+    public AuthResponse(Long userId, String accessToken, String refreshToken, String email, String message) {
         this.userId = userId;
-        this.token = token;
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
         this.email = email;
         this.message = message;
     }
@@ -17,8 +19,12 @@ public class AuthResponse {
         return userId;
     }
 
-    public String getToken() {
-        return token;
+    public String getAccessToken() {
+        return accessToken;
+    }
+
+    public String getRefreshToken() {
+        return refreshToken;
     }
 
     public String getEmail() {
@@ -33,8 +39,12 @@ public class AuthResponse {
         this.userId = userId;
     }
 
-    public void setToken(String token) {
-        this.token = token;
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
+    }
+
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 
     public void setEmail(String email) {

@@ -45,9 +45,10 @@ public class UserService {
         User user = new User(name, email, hashedPassword, now, now);
         User saveUser = userRepository.save(user);
 
-        String token = jwtUtil.generateToken(email, saveUser.getId());
+        String accessToken = jwtUtil.generateAccessToken(email, saveUser.getId());
+        String refreshToken = jwtUtil.generateRefreshToken(email, saveUser.getId());
 
-        return new AuthResponse(saveUser.getId(), token, saveUser.getEmail(), "User registered successfully");
+        return new AuthResponse(saveUser.getId(), accessToken, refreshToken, saveUser.getEmail(), "User registered successfully");
     }
 
     public AuthResponse loginUser(String email, String password) {
@@ -69,9 +70,31 @@ public class UserService {
             throw new IllegalArgumentException("Invalid Email or Password");
         }
 
-        String token = jwtUtil.generateToken(email, existingUser.getId());
+        String accessToken = jwtUtil.generateAccessToken(email, existingUser.getId());
+        String refreshToken = jwtUtil.generateRefreshToken(email, existingUser.getId());
 
-        return new AuthResponse(existingUser.getId(), token, existingUser.getEmail(), "Login Successful");
+        return new AuthResponse(existingUser.getId(), accessToken,  refreshToken, existingUser.getEmail(), "Login Successful");
+    }
+
+    public AuthResponse refreshUserSession(String refreshToken) {
+        if (refreshToken == null || refreshToken.trim().isEmpty()) {
+            throw new IllegalArgumentException("Refresh Token is Required");
+        }
+
+        boolean isRefreshTokenVerified = jwtUtil.validateRefreshToken(refreshToken);
+
+        if (!isRefreshTokenVerified) {
+            throw new IllegalArgumentException("Refresh Token not verified");
+        }
+
+        String email = jwtUtil.extractEmailFromRefreshToken(refreshToken);
+        Long userId = jwtUtil.extractUserIdFromRefreshToken(refreshToken);
+
+        String accessToken = jwtUtil.generateAccessToken(email, userId);
+        String newRefreshToken = jwtUtil.generateRefreshToken(email, userId);
+
+        return new AuthResponse(userId, accessToken,  newRefreshToken, email, "User Session Refresh Successful");
+
     }
 
     public User getUserById (Long id) {
