@@ -31,7 +31,7 @@ public class Player {
     private Integer runsScored = 0;
     private Integer wicketsTaken = 0;
     private Float battingAverage = 0f;
-    private Float bolwingAverage = 0f;
+    private Float bowlingAverage = 0f;
 
     @Column(nullable = false,  name = "created_at")
     private Long createdAt;
@@ -111,12 +111,12 @@ public class Player {
         this.battingAverage = battingAverage;
     }
 
-    public Float getBolwingAverage() {
-        return bolwingAverage;
+    public Float getBowlingAverage() {
+        return bowlingAverage;
     }
 
-    public void setBolwingAverage(Float bolwingAverage) {
-        this.bolwingAverage = bolwingAverage;
+    public void setBowlingAverage(Float bowlingAverage) {
+        this.bowlingAverage = bowlingAverage;
     }
 
     public Long getCreatedAt() {
