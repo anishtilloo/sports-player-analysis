@@ -1,5 +1,7 @@
 package com.sports_analysis_app.sports_analysis_app.player.entity;
 
+import com.sports_analysis_app.sports_analysis_app.player.dto.PlayerRequest;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -38,6 +40,18 @@ public class Player {
 
     @Column(nullable = false,  name = "updated_at")
     private Long updatedAt;
+ 
+    public Player() {}
+
+    public Player (PlayerRequest playerPayload, Long createdAt, Long updatedAt) {
+        this.email = playerPayload.getEmail();
+        this.name = playerPayload.getName();
+        this.role = playerPayload.getRole();
+        this.currentTeamName = playerPayload.getCurrentTeamName();
+        this.jerseyNumber = playerPayload.getJerseyNumber();
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
 
     public Long getId() {
         return id;
