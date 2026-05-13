@@ -1,11 +1,13 @@
 package com.sports_analysis_app.sports_analysis_app.player.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.sports_analysis_app.sports_analysis_app.player.dto.PlayerRequest;
+import com.sports_analysis_app.sports_analysis_app.player.dto.PlayerUpdateRequest;
 import com.sports_analysis_app.sports_analysis_app.player.entity.Player;
 import com.sports_analysis_app.sports_analysis_app.player.repository.PlayerRepository;
 
@@ -28,7 +30,7 @@ public class PlayerService {
     }
 
     public Player getPlayerByEmail(String email) {
-        if (email == null) {
+        if (email == null || email.trim().isEmpty()) {
             throw new IllegalArgumentException("Email is Required");
         }
 
@@ -69,5 +71,59 @@ public class PlayerService {
             throw new IllegalArgumentException("Please provide appropriate player id");
         }
         playerRepository.deleteById(playerId);
+    }
+
+    public Player getPlayerByName(String name) {
+        if (name == null || name.trim().isEmpty()) {
+            throw new IllegalArgumentException("Name is Required");
+        }
+
+        Player player = playerRepository.findByNameContainingIgnoreCases(name);
+
+        if (player == null) {
+            throw new IllegalArgumentException("Player with this name does not exist");
+        }
+
+        return player;
+    }
+
+    public List<Player> getAllPlayers() {
+        return playerRepository.findAll();
+    }
+
+    public List<Player> getPlayersByRole(String role) {
+        if (role == null || role.trim().isEmpty()) {
+            throw new IllegalArgumentException("Role is Required");
+        }
+
+        return playerRepository.findByRoleContainingIgnoreCases(role);
+    }
+
+    public List<Player> getPlayersByTeam(String team) {
+        if (team == null || team.trim().isEmpty()) {
+            throw new IllegalArgumentException("Team is Required");
+        }
+        return playerRepository.findPlayersByTeam(team);
+    }
+
+    public List<Player> searchPlayers(String query) {
+        if (query == null || query.trim().isEmpty()) {
+            throw new IllegalArgumentException("Search term is Required");
+        }
+
+        return playerRepository.findByEmailContainingIgnoreCasesOrNameContainingIgnoreCases(query, query);
+    }
+
+    public Player updatePlayer(Long id, PlayerUpdateRequest request) {
+        Player existingPlayer = this.getPlayerById(id).orElseThrow(() -> new RuntimeException("Player not found with id" + id));
+
+        existingPlayer.setName(request.getName());
+        existingPlayer.setEmail(request.getEmail());
+        existingPlayer.setRole(request.getRole());
+        existingPlayer.setCurrentTeamName(request.getCurrentTeamName());
+        existingPlayer.setJerseyNumber(request.getJerseyNumber());
+
+        Player updatedPlayer = playerRepository.save(existingPlayer);
+        return updatedPlayer;
     }
 }
