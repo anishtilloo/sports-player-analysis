@@ -78,7 +78,7 @@ public class PlayerService {
             throw new IllegalArgumentException("Name is Required");
         }
 
-        Player player = playerRepository.findByNameContainingIgnoreCases(name);
+        Player player = playerRepository.findByNameContainingIgnoreCase(name);
 
         if (player == null) {
             throw new IllegalArgumentException("Player with this name does not exist");
@@ -96,14 +96,14 @@ public class PlayerService {
             throw new IllegalArgumentException("Role is Required");
         }
 
-        return playerRepository.findByRoleContainingIgnoreCases(role);
+        return playerRepository.findAllByRoleContainingIgnoreCase(role);
     }
 
     public List<Player> getPlayersByTeam(String team) {
         if (team == null || team.trim().isEmpty()) {
             throw new IllegalArgumentException("Team is Required");
         }
-        return playerRepository.findPlayersByTeam(team);
+        return playerRepository.findAllByCurrentTeamNameContainingIgnoreCase(team);
     }
 
     public List<Player> searchPlayers(String query) {
@@ -111,7 +111,7 @@ public class PlayerService {
             throw new IllegalArgumentException("Search term is Required");
         }
 
-        return playerRepository.findByEmailContainingIgnoreCasesOrNameContainingIgnoreCases(query, query);
+        return playerRepository.findAllByEmailContainingIgnoreCaseOrNameContainingIgnoreCase(query, query);
     }
 
     public Player updatePlayer(Long id, PlayerUpdateRequest request) {

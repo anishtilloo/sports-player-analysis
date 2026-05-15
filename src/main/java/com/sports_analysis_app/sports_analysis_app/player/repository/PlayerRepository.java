@@ -11,12 +11,12 @@ import com.sports_analysis_app.sports_analysis_app.player.entity.Player;
 public interface PlayerRepository extends JpaRepository<Player, Long> {
     Player findByEmail(String email);
 
-    Player findByNameContainingIgnoreCases(String name);
+    Player findByNameContainingIgnoreCase(String name);
 
-    List<Player> findByRoleContainingIgnoreCases(String role);
+    List<Player> findAllByRoleContainingIgnoreCase(String role);
 
-    List<Player> findPlayersByTeam(String team);
+    List<Player> findAllByCurrentTeamNameContainingIgnoreCase(String team);
 
-    List<Player> findByEmailContainingIgnoreCasesOrNameContainingIgnoreCases(String email, String name);
+    List<Player> findAllByEmailContainingIgnoreCaseOrNameContainingIgnoreCase(String email, String name);
         
 }
