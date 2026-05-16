@@ -4,9 +4,11 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sports_analysis_app.sports_analysis_app.annotation.auth.AuthRequired;
 import com.sports_analysis_app.sports_analysis_app.player.dto.PlayerRequest;
 import com.sports_analysis_app.sports_analysis_app.player.dto.PlayerUpdateRequest;
 import com.sports_analysis_app.sports_analysis_app.player.entity.Player;
@@ -29,11 +31,14 @@ public class PlayerController {
     @Autowired
     private PlayerService service;
 
+    // @PreAuthorize("isAuthenticated()")
+    @AuthRequired
     @PostMapping
     public Player create(@RequestBody PlayerRequest request) {
        return service.registerPlayer(request);
     }
 
+    @AuthRequired
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
         service.deletePlayer(id);
