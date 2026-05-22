@@ -1,5 +1,8 @@
 package com.sports_analysis_app.sports_analysis_app.user.entity;
 
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -22,9 +25,11 @@ public class User {
     @Column(nullable = false)
     private String password;
     
+    @CreatedDate
     @Column(nullable = false,  name = "created_at")
     private Long createdAt;
 
+    @LastModifiedDate
     @Column(nullable = false,  name = "updated_at")
     private Long updatedAt;
 
