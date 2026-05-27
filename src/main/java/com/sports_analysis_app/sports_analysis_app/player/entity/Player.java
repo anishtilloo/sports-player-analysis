@@ -1,9 +1,12 @@
 package com.sports_analysis_app.sports_analysis_app.player.entity;
 
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import com.sports_analysis_app.sports_analysis_app.player.dto.PlayerRequest;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -11,10 +14,14 @@ import jakarta.persistence.GenerationType;
 
 @Entity
 @Table(name="players")
+@EntityListeners(AuditingEntityListener.class)
 public class Player {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false, name = "player_uid")
+    private String playerUid;
 
     @Column(nullable = false)
     private String name;
