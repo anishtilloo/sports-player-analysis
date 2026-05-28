@@ -20,8 +20,8 @@ public class UserController {
     private UserService userService;
 
     @GetMapping("/me/{uid}")
-    public User getUser(@PathVariable String uid) {
-        return userService.getUserById(uid);
+    public User getUserByUid(@PathVariable String uid) {
+        return userService.getUserByUid(uid);
     }
 
     @GetMapping("/email/{email}")
