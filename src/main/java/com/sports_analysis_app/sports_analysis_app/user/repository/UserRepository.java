@@ -8,4 +8,6 @@ import com.sports_analysis_app.sports_analysis_app.user.entity.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     User findByEmail(String email);
+
+    User findByUid(String uid);
 }
