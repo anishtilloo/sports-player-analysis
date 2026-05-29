@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sports_analysis_app.sports_analysis_app.annotation.auth.AuthRequired;
 import com.sports_analysis_app.sports_analysis_app.user.entity.User;
 import com.sports_analysis_app.sports_analysis_app.user.service.UserService;
 
@@ -19,11 +20,15 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+
+    @AuthRequired
     @GetMapping("/me/{uid}")
     public User getUserByUid(@PathVariable String uid) {
         return userService.getUserByUid(uid);
     }
 
+
+    @AuthRequired
     @GetMapping("/email/{email}")
     public User getUserByEmail(@PathVariable String email) {
         return userService.getUserByEmail(email);
