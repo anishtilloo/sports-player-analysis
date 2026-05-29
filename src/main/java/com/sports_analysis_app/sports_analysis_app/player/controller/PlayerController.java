@@ -30,12 +30,13 @@ public class PlayerController {
     @Autowired
     private PlayerService service;
 
-    // @PreAuthorize("isAuthenticated()")
+
     @AuthRequired
     @PostMapping
     public Player create(@RequestBody PlayerRequest request) {
        return service.registerPlayer(request);
     }
+
 
     @AuthRequired
     @DeleteMapping("/{id}")
@@ -43,41 +44,57 @@ public class PlayerController {
         service.deletePlayer(id);
     }
     
+
+    @AuthRequired
     @GetMapping("/{id}")
     public Optional<Player> getUser(@PathVariable Long id) {
         return service.getPlayerById(id);
     }
 
+
+    @AuthRequired
     @GetMapping("/email/{email}")
     public Player getUser(@PathVariable String email) {
         return service.getPlayerByEmail(email);
     }
     
+
+    @AuthRequired
     @GetMapping("/name/{name}")
     public Player getMethodName(@PathVariable String name) {
         return service.getPlayerByName(name);
     }
     
+
+    @AuthRequired
     @GetMapping
     public List<Player> getAllPlayers() {
         return service.getAllPlayers();
     }
 
+
+    @AuthRequired
     @GetMapping("/role/{role}")
     public List<Player> getPlayersByRole(@PathVariable String role) {
         return service.getPlayersByRole(role);
     }
     
+
+    @AuthRequired
     @GetMapping("/team/{team}")
     public List<Player> getPlayersByTeam(@PathVariable String team) {
         return service.getPlayersByTeam(team);
     }
 
+
+    @AuthRequired
     @GetMapping("/search")
     public List<Player> searchPlayers(@PathVariable String searchQuery) {
         return service.searchPlayers(searchQuery);
     }
     
+
+    @AuthRequired
     @PutMapping("/{id}")
     public Player updatePlayer(@PathVariable Long id, @RequestBody PlayerUpdateRequest request) {
         return service.updatePlayer(id, request);
