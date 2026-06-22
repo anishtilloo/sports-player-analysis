@@ -7,5 +7,5 @@ import com.sports_analysis_app.sports_analysis_app.organization.entity.Organizat
 
 @Repository
 public interface OrganizationRepository extends JpaRepository<Organization, Long> {
-    Organization findByUidContainingIgnoreCase(String uid);
+    Organization findByOrgUidContainingIgnoreCase(String uid);
 }
