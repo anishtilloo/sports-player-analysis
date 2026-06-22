@@ -50,12 +50,7 @@ public class SecurityErrorWriter {
             this.reasonPhrase = reasonPhrase;
         }
 
-        public int value() {
-            return value;
-        }
-
-        public String reasonPhrase() {
-            return reasonPhrase;
-        }
+        public int value() { return value; }
+        public String reasonPhrase() { return reasonPhrase; }
     }
 }
