@@ -7,6 +7,8 @@ public class AuthResponse {
     private String email;
     private String message;
 
+    public AuthResponse() {}
+
     public AuthResponse(Long userId, String accessToken, String refreshToken, String email, String message) {
         this.userId = userId;
         this.accessToken = accessToken;
@@ -14,44 +16,15 @@ public class AuthResponse {
         this.email = email;
         this.message = message;
     }
-    
-    public Long getUserId() {
-        return userId;
-    }
 
-    public String getAccessToken() {
-        return accessToken;
-    }
-
-    public String getRefreshToken() {
-        return refreshToken;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
-    public void setAccessToken(String accessToken) {
-        this.accessToken = accessToken;
-    }
-
-    public void setRefreshToken(String refreshToken) {
-        this.refreshToken = refreshToken;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
+    public Long getUserId() { return userId; }
+    public void setUserId(Long userId) { this.userId = userId; }
+    public String getAccessToken() { return accessToken; }
+    public void setAccessToken(String accessToken) { this.accessToken = accessToken; }
+    public String getRefreshToken() { return refreshToken; }
+    public void setRefreshToken(String refreshToken) { this.refreshToken = refreshToken; }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+    public String getMessage() { return message; }
+    public void setMessage(String message) { this.message = message; }
 }

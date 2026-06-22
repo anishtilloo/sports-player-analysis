@@ -1,8 +1,11 @@
 package com.sports_analysis_app.sports_analysis_app.user.service;
 
 import java.time.Instant;
+import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import com.sports_analysis_app.sports_analysis_app.security.JwtUtil;
 import com.sports_analysis_app.sports_analysis_app.security.PasswordEncoder;
@@ -10,90 +13,91 @@ import com.sports_analysis_app.sports_analysis_app.user.dto.AuthResponse;
 import com.sports_analysis_app.sports_analysis_app.user.entity.User;
 import com.sports_analysis_app.sports_analysis_app.user.repository.UserRepository;
 
+@Service
 public class AuthService {
-    @Autowired
-    private UserRepository userRepository;
+    private static final Logger log = LoggerFactory.getLogger(AuthService.class);
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
-    @Autowired
-    private JwtUtil jwtUtil;
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
+    }
 
-    public AuthResponse registerUser (String email, String name, String password) {
+    public AuthResponse registerUser(String email, String name, String password) {
         if (email == null || email.trim().isEmpty()) {
-            throw new IllegalArgumentException("Email is Required");
+            throw new IllegalArgumentException("Email is required");
+        }
+        if (name == null || name.trim().isEmpty()) {
+            throw new IllegalArgumentException("Name is required");
+        }
+        if (password == null || password.trim().isEmpty()) {
+            throw new IllegalArgumentException("Password is required");
         }
 
         User existingUser = userRepository.findByEmail(email);
-
         if (existingUser != null) {
             throw new IllegalArgumentException("Email already registered");
         }
 
-        if (name == null || name.trim().isEmpty()) {
-            throw new IllegalArgumentException("Name is Required");
-        }
-
-        if (password == null || password.trim().isEmpty()) {
-            throw new IllegalArgumentException("Password is Required");
-        }
-
         Instant now = Instant.now();
         String hashedPassword = passwordEncoder.hashPassword(password);
-        User user = new User("1234565432", name, email, hashedPassword, now, now);
-        User saveUser = userRepository.save(user);
+        User user = new User(UUID.randomUUID().toString(), name, email, hashedPassword, now, now);
+        User savedUser = userRepository.save(user);
 
-        String accessToken = jwtUtil.generateAccessToken(email, saveUser.getId());
-        String refreshToken = jwtUtil.generateRefreshToken(email, saveUser.getId());
+        log.info("Registered new user with email: {}", email);
 
-        return new AuthResponse(saveUser.getId(), accessToken, refreshToken, saveUser.getEmail(), "User registered successfully");
+        String accessToken = jwtUtil.generateAccessToken(email, savedUser.getId());
+        String refreshToken = jwtUtil.generateRefreshToken(email, savedUser.getId());
+
+        return new AuthResponse(savedUser.getId(), accessToken, refreshToken, savedUser.getEmail(), "User registered successfully");
     }
 
     public AuthResponse loginUser(String email, String password) {
         if (email == null || email.trim().isEmpty()) {
-            throw new IllegalArgumentException("Email is Required");
+            throw new IllegalArgumentException("Email is required");
         }
-
         if (password == null || password.trim().isEmpty()) {
-            throw new IllegalArgumentException("Password is Required");
+            throw new IllegalArgumentException("Password is required");
         }
 
         User existingUser = userRepository.findByEmail(email);
-
         if (existingUser == null) {
-            throw new IllegalArgumentException("Email already registered");
+            throw new IllegalArgumentException("Invalid email or password");
         }
 
         if (!passwordEncoder.verifyPassword(password, existingUser.getPassword())) {
-            throw new IllegalArgumentException("Invalid Email or Password");
+            throw new IllegalArgumentException("Invalid email or password");
         }
+
+        log.info("User logged in with email: {}", email);
 
         String accessToken = jwtUtil.generateAccessToken(email, existingUser.getId());
         String refreshToken = jwtUtil.generateRefreshToken(email, existingUser.getId());
 
-        return new AuthResponse(existingUser.getId(), accessToken,  refreshToken, existingUser.getEmail(), "Login Successful");
+        return new AuthResponse(existingUser.getId(), accessToken, refreshToken, existingUser.getEmail(), "Login successful");
     }
 
     public AuthResponse refreshUserSession(String refreshToken) {
         if (refreshToken == null || refreshToken.trim().isEmpty()) {
-            throw new IllegalArgumentException("Refresh Token is Required");
+            throw new IllegalArgumentException("Refresh token is required");
         }
 
-        boolean isRefreshTokenVerified = jwtUtil.validateRefreshToken(refreshToken);
-
-        if (!isRefreshTokenVerified) {
-            throw new IllegalArgumentException("Refresh Token not verified");
+        if (!jwtUtil.validateRefreshToken(refreshToken)) {
+            throw new IllegalArgumentException("Refresh token is invalid or expired");
         }
 
         String email = jwtUtil.extractEmailFromRefreshToken(refreshToken);
         Long userId = jwtUtil.extractUserIdFromRefreshToken(refreshToken);
 
+        log.debug("Refreshing session for user: {}", email);
+
         String accessToken = jwtUtil.generateAccessToken(email, userId);
         String newRefreshToken = jwtUtil.generateRefreshToken(email, userId);
 
-        return new AuthResponse(userId, accessToken,  newRefreshToken, email, "User Session Refresh Successful");
-
+        return new AuthResponse(userId, accessToken, newRefreshToken, email, "Session refreshed successfully");
     }
-
 }
