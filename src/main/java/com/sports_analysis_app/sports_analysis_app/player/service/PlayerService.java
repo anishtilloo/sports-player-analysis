@@ -1,11 +1,13 @@
 package com.sports_analysis_app.sports_analysis_app.player.service;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import com.sports_analysis_app.sports_analysis_app.common.exception.ResourceNotFoundException;
 import com.sports_analysis_app.sports_analysis_app.player.dto.PlayerRequest;
 import com.sports_analysis_app.sports_analysis_app.player.dto.PlayerUpdateRequest;
 import com.sports_analysis_app.sports_analysis_app.player.entity.Player;
@@ -13,77 +15,64 @@ import com.sports_analysis_app.sports_analysis_app.player.repository.PlayerRepos
 
 @Service
 public class PlayerService {
-    @Autowired
-    private PlayerRepository playerRepository;
+    private static final Logger log = LoggerFactory.getLogger(PlayerService.class);
 
-    public Optional<Player> getPlayerById(Long playerId) {
+    private final PlayerRepository playerRepository;
+
+    public PlayerService(PlayerRepository playerRepository) {
+        this.playerRepository = playerRepository;
+    }
+
+    public Player getPlayerById(Long playerId) {
         if (playerId == null) {
-            throw new IllegalArgumentException("Please provide appropriate player id");
+            throw new IllegalArgumentException("Player id is required");
         }
-
-        Optional<Player> player = playerRepository.findById(playerId);
-
-        if (player == null) {
-            throw new IllegalArgumentException("Player with this id does not exist");
-        }
-        return player;
+        return playerRepository.findById(playerId)
+                .orElseThrow(() -> new ResourceNotFoundException("Player not found with id: " + playerId));
     }
 
     public Player getPlayerByEmail(String email) {
         if (email == null || email.trim().isEmpty()) {
-            throw new IllegalArgumentException("Email is Required");
+            throw new IllegalArgumentException("Email is required");
         }
-
         Player player = playerRepository.findByEmail(email);
-
         if (player == null) {
-            throw new IllegalArgumentException("Player with this email does not exist");
+            throw new ResourceNotFoundException("Player not found with email: " + email);
         }
-
         return player;
     }
 
     public Player registerPlayer(PlayerRequest playerPayload) {
-        if (playerPayload.getEmail() == null || playerPayload.getEmail().trim().isEmpty()) {
-            throw new IllegalArgumentException("Email is Required");
-        }
-
         Player existingPlayer = playerRepository.findByEmail(playerPayload.getEmail());
-
         if (existingPlayer != null) {
             throw new IllegalArgumentException("Email already registered");
         }
 
-        if (playerPayload.getName() == null || playerPayload.getName().trim().isEmpty()) {
-            throw new IllegalArgumentException("Name is Required");
-        }
-
         long now = System.currentTimeMillis();
         Player player = new Player(playerPayload, now, now);
+        player.setPlayerUid(UUID.randomUUID().toString());
+        Player savedPlayer = playerRepository.save(player);
 
-        Player savePlayer = playerRepository.save(player);
-
-        return savePlayer;
+        log.info("Registered new player with email: {}", playerPayload.getEmail());
+        return savedPlayer;
     }
 
     public void deletePlayer(Long playerId) {
-        if (playerId == null) {
-            throw new IllegalArgumentException("Please provide appropriate player id");
+        if (!playerRepository.existsById(playerId)) {
+            throw new ResourceNotFoundException("Player not found with id: " + playerId);
         }
         playerRepository.deleteById(playerId);
+        log.info("Deleted player with id: {}", playerId);
     }
 
     public Player getPlayerByName(String name) {
         if (name == null || name.trim().isEmpty()) {
-            throw new IllegalArgumentException("Name is Required");
+            throw new IllegalArgumentException("Name is required");
         }
-
         Player player = playerRepository.findByNameContainingIgnoreCase(name);
-
         if (player == null) {
-            throw new IllegalArgumentException("Player with this name does not exist");
+            throw new ResourceNotFoundException("Player not found with name: " + name);
         }
-
         return player;
     }
 
@@ -93,37 +82,34 @@ public class PlayerService {
 
     public List<Player> getPlayersByRole(String role) {
         if (role == null || role.trim().isEmpty()) {
-            throw new IllegalArgumentException("Role is Required");
+            throw new IllegalArgumentException("Role is required");
         }
-
         return playerRepository.findAllByRoleContainingIgnoreCase(role);
     }
 
     public List<Player> getPlayersByTeam(String team) {
         if (team == null || team.trim().isEmpty()) {
-            throw new IllegalArgumentException("Team is Required");
+            throw new IllegalArgumentException("Team is required");
         }
         return playerRepository.findAllByCurrentTeamNameContainingIgnoreCase(team);
     }
 
     public List<Player> searchPlayers(String query) {
         if (query == null || query.trim().isEmpty()) {
-            throw new IllegalArgumentException("Search term is Required");
+            throw new IllegalArgumentException("Search term is required");
         }
-
         return playerRepository.findAllByEmailContainingIgnoreCaseOrNameContainingIgnoreCase(query, query);
     }
 
     public Player updatePlayer(Long id, PlayerUpdateRequest request) {
-        Player existingPlayer = this.getPlayerById(id).orElseThrow(() -> new RuntimeException("Player not found with id" + id));
-
+        Player existingPlayer = getPlayerById(id);
         existingPlayer.setName(request.getName());
         existingPlayer.setEmail(request.getEmail());
         existingPlayer.setRole(request.getRole());
         existingPlayer.setCurrentTeamName(request.getCurrentTeamName());
         existingPlayer.setJerseyNumber(request.getJerseyNumber());
-
-        Player updatedPlayer = playerRepository.save(existingPlayer);
-        return updatedPlayer;
+        Player updated = playerRepository.save(existingPlayer);
+        log.info("Updated player with id: {}", id);
+        return updated;
     }
 }

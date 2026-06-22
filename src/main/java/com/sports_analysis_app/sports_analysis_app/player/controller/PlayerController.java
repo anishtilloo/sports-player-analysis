@@ -1,10 +1,17 @@
 package com.sports_analysis_app.sports_analysis_app.player.controller;
 
 import java.util.List;
-import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sports_analysis_app.sports_analysis_app.annotation.auth.AuthRequired;
@@ -13,88 +20,76 @@ import com.sports_analysis_app.sports_analysis_app.player.dto.PlayerUpdateReques
 import com.sports_analysis_app.sports_analysis_app.player.entity.Player;
 import com.sports_analysis_app.sports_analysis_app.player.service.PlayerService;
 
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.PutMapping;
-
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/player")
 public class PlayerController {
-    
-    @Autowired
-    private PlayerService service;
 
+    private final PlayerService service;
+
+    public PlayerController(PlayerService service) {
+        this.service = service;
+    }
 
     @AuthRequired
     @PostMapping
-    public Player create(@RequestBody PlayerRequest request) {
-       return service.registerPlayer(request);
+    public ResponseEntity<Player> createPlayer(@Valid @RequestBody PlayerRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.registerPlayer(request));
     }
-
 
     @AuthRequired
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
+    public ResponseEntity<Void> deletePlayer(@PathVariable Long id) {
         service.deletePlayer(id);
+        return ResponseEntity.noContent().build();
     }
-    
 
     @AuthRequired
     @GetMapping("/{id}")
-    public Optional<Player> getUser(@PathVariable Long id) {
-        return service.getPlayerById(id);
+    public ResponseEntity<Player> getPlayerById(@PathVariable Long id) {
+        return ResponseEntity.ok(service.getPlayerById(id));
     }
-
 
     @AuthRequired
     @GetMapping("/email/{email}")
-    public Player getUser(@PathVariable String email) {
-        return service.getPlayerByEmail(email);
+    public ResponseEntity<Player> getPlayerByEmail(@PathVariable String email) {
+        return ResponseEntity.ok(service.getPlayerByEmail(email));
     }
-    
 
     @AuthRequired
     @GetMapping("/name/{name}")
-    public Player getMethodName(@PathVariable String name) {
-        return service.getPlayerByName(name);
+    public ResponseEntity<Player> getPlayerByName(@PathVariable String name) {
+        return ResponseEntity.ok(service.getPlayerByName(name));
     }
-    
 
     @AuthRequired
     @GetMapping
-    public List<Player> getAllPlayers() {
-        return service.getAllPlayers();
+    public ResponseEntity<List<Player>> getAllPlayers() {
+        return ResponseEntity.ok(service.getAllPlayers());
     }
-
 
     @AuthRequired
     @GetMapping("/role/{role}")
-    public List<Player> getPlayersByRole(@PathVariable String role) {
-        return service.getPlayersByRole(role);
+    public ResponseEntity<List<Player>> getPlayersByRole(@PathVariable String role) {
+        return ResponseEntity.ok(service.getPlayersByRole(role));
     }
-    
 
     @AuthRequired
     @GetMapping("/team/{team}")
-    public List<Player> getPlayersByTeam(@PathVariable String team) {
-        return service.getPlayersByTeam(team);
+    public ResponseEntity<List<Player>> getPlayersByTeam(@PathVariable String team) {
+        return ResponseEntity.ok(service.getPlayersByTeam(team));
     }
-
 
     @AuthRequired
     @GetMapping("/search")
-    public List<Player> searchPlayers(@PathVariable String searchQuery) {
-        return service.searchPlayers(searchQuery);
+    public ResponseEntity<List<Player>> searchPlayers(@RequestParam String q) {
+        return ResponseEntity.ok(service.searchPlayers(q));
     }
-    
 
     @AuthRequired
     @PutMapping("/{id}")
-    public Player updatePlayer(@PathVariable Long id, @RequestBody PlayerUpdateRequest request) {
-        return service.updatePlayer(id, request);
+    public ResponseEntity<Player> updatePlayer(@PathVariable Long id, @Valid @RequestBody PlayerUpdateRequest request) {
+        return ResponseEntity.ok(service.updatePlayer(id, request));
     }
 }
