@@ -27,13 +27,11 @@ public class PlayerContract {
     private Long id;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "player_id", referencedColumnName = "id")
-    @Column(nullable = false)
+    @JoinColumn(name = "player_id", referencedColumnName = "id", nullable = false)
     private Player player;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "organization_id", referencedColumnName = "id")
-    @Column(nullable = false)
+    @JoinColumn(name = "organization_id", referencedColumnName = "id", nullable = false)
     private Organization organization;
 
     @Column(nullable = false,  name = "starts_at")

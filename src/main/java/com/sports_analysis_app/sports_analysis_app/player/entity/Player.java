@@ -68,6 +68,14 @@ public class Player {
         this.id = id;
     }
 
+    public String getPlayerUid() {
+        return playerUid;
+    }
+
+    public void setPlayerUid(String playerUid) {
+        this.playerUid = playerUid;
+    }
+
     public String getName() {
         return name;
     }

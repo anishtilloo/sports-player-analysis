@@ -34,8 +34,7 @@ public class Team {
     private String name;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "org_id", referencedColumnName = "id")
-    @Column(nullable = false)
+    @JoinColumn(name = "org_id", referencedColumnName = "id", nullable = false)
     private Organization organization;
 
     @CreatedDate

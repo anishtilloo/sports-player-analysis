@@ -13,6 +13,8 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -20,7 +22,7 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name="users")
+@Table(name = "users")
 @EntityListeners(AuditingEntityListener.class)
 public class User {
     @Id
@@ -33,29 +35,28 @@ public class User {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String email;
 
     @Column(nullable = false)
     private String password;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Roles role;
+    private Roles role = Roles.USER;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "organization_id", referencedColumnName = "id")
-    @Column(nullable = true)
     private Organization organization;
 
     @CreatedDate
-    @Column(nullable = false,  name = "created_at")
+    @Column(nullable = false, name = "created_at", updatable = false)
     private Instant createdAt;
 
     @LastModifiedDate
-    @Column(nullable = false,  name = "updated_at")
+    @Column(nullable = false, name = "updated_at")
     private Instant updatedAt;
 
-    // When we use a parameterized constructor Hibernate stops using the default constructor so we have to specifically define it
     public User() {}
 
     public User(String uid, String name, String email, String password, Instant createdAt, Instant updatedAt) {
@@ -67,28 +68,26 @@ public class User {
         this.updatedAt = updatedAt;
     }
 
-    // Setters
-    public void setName(String name) { this.name = name; }
-    public void setEmail(String email) { this.email = email; }
-    public void setPassword(String password) { this.password = password; }
-    public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
-    public void setUpdatedAt(Instant updatedAt) { this.updatedAt = updatedAt; }
-
-    // Getters
     public Long getId() { return id; }
+    public String getUid() { return uid; }
     public String getName() { return name; }
     public String getEmail() { return email; }
     public String getPassword() { return password; }
+    public Roles getRole() { return role; }
+    public Organization getOrganization() { return organization; }
     public Instant getCreatedAt() { return createdAt; }
     public Instant getUpdatedAt() { return updatedAt; }
 
+    public void setName(String name) { this.name = name; }
+    public void setEmail(String email) { this.email = email; }
+    public void setPassword(String password) { this.password = password; }
+    public void setRole(Roles role) { this.role = role; }
+    public void setOrganization(Organization organization) { this.organization = organization; }
+    public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
+    public void setUpdatedAt(Instant updatedAt) { this.updatedAt = updatedAt; }
 
     @Override
     public String toString() {
-        return "User {" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", email='" + email + '\'' +
-                '}';
+        return "User{id=" + id + ", name='" + name + "', email='" + email + "'}";
     }
 }
