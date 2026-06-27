@@ -76,9 +76,9 @@ public class PlayerController {
     }
 
     @AuthRequired
-    @GetMapping("/team/{team}")
-    public ResponseEntity<List<Player>> getPlayersByTeam(@PathVariable String team) {
-        return ResponseEntity.ok(service.getPlayersByTeam(team));
+    @GetMapping("/team/{teamUid}")
+    public ResponseEntity<List<Player>> getPlayersByTeam(@PathVariable String teamUid) {
+        return ResponseEntity.ok(service.getPlayersByTeamUid(teamUid));
     }
 
     @AuthRequired

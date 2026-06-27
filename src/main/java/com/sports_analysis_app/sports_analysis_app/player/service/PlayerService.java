@@ -12,15 +12,19 @@ import com.sports_analysis_app.sports_analysis_app.player.dto.PlayerRequest;
 import com.sports_analysis_app.sports_analysis_app.player.dto.PlayerUpdateRequest;
 import com.sports_analysis_app.sports_analysis_app.player.entity.Player;
 import com.sports_analysis_app.sports_analysis_app.player.repository.PlayerRepository;
+import com.sports_analysis_app.sports_analysis_app.team.entity.Team;
+import com.sports_analysis_app.sports_analysis_app.team.repository.TeamRepository;
 
 @Service
 public class PlayerService {
     private static final Logger log = LoggerFactory.getLogger(PlayerService.class);
 
     private final PlayerRepository playerRepository;
+    private final TeamRepository teamRepository;
 
-    public PlayerService(PlayerRepository playerRepository) {
+    public PlayerService(PlayerRepository playerRepository, TeamRepository teamRepository) {
         this.playerRepository = playerRepository;
+        this.teamRepository = teamRepository;
     }
 
     public Player getPlayerById(Long playerId) {
@@ -48,9 +52,15 @@ public class PlayerService {
             throw new IllegalArgumentException("Email already registered");
         }
 
+        Team team = teamRepository.findByTeamUidContainingIgnoreCase(playerPayload.getTeamUid());
+        if (team == null) {
+            throw new ResourceNotFoundException("Team not found with uid: " + playerPayload.getTeamUid());
+        }
+
         long now = System.currentTimeMillis();
         Player player = new Player(playerPayload, now, now);
         player.setPlayerUid(UUID.randomUUID().toString());
+        player.setTeam(team);
         Player savedPlayer = playerRepository.save(player);
 
         log.info("Registered new player with email: {}", playerPayload.getEmail());
@@ -87,11 +97,11 @@ public class PlayerService {
         return playerRepository.findAllByRoleContainingIgnoreCase(role);
     }
 
-    public List<Player> getPlayersByTeam(String team) {
-        if (team == null || team.trim().isEmpty()) {
-            throw new IllegalArgumentException("Team is required");
+    public List<Player> getPlayersByTeamUid(String teamUid) {
+        if (teamUid == null || teamUid.trim().isEmpty()) {
+            throw new IllegalArgumentException("Team UID is required");
         }
-        return playerRepository.findAllByCurrentTeamNameContainingIgnoreCase(team);
+        return playerRepository.findAllByTeam_TeamUid(teamUid);
     }
 
     public List<Player> searchPlayers(String query) {
@@ -103,10 +113,16 @@ public class PlayerService {
 
     public Player updatePlayer(Long id, PlayerUpdateRequest request) {
         Player existingPlayer = getPlayerById(id);
+
+        Team team = teamRepository.findByTeamUidContainingIgnoreCase(request.getTeamUid());
+        if (team == null) {
+            throw new ResourceNotFoundException("Team not found with uid: " + request.getTeamUid());
+        }
+
         existingPlayer.setName(request.getName());
         existingPlayer.setEmail(request.getEmail());
         existingPlayer.setRole(request.getRole());
-        existingPlayer.setCurrentTeamName(request.getCurrentTeamName());
+        existingPlayer.setTeam(team);
         existingPlayer.setJerseyNumber(request.getJerseyNumber());
         Player updated = playerRepository.save(existingPlayer);
         log.info("Updated player with id: {}", id);

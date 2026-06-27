@@ -3,14 +3,17 @@ package com.sports_analysis_app.sports_analysis_app.player.entity;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.sports_analysis_app.sports_analysis_app.player.dto.PlayerRequest;
+import com.sports_analysis_app.sports_analysis_app.team.entity.Team;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name="players")
@@ -32,8 +35,9 @@ public class Player {
     @Column(nullable = false)
     private String role;
 
-    @Column(nullable = false)
-    private String currentTeamName;
+    @ManyToOne
+    @JoinColumn(name = "team_id", nullable = false)
+    private Team team;
 
     private Integer jerseyNumber;
 
@@ -50,11 +54,10 @@ public class Player {
  
     public Player() {}
 
-    public Player (PlayerRequest playerPayload, Long createdAt, Long updatedAt) {
+    public Player(PlayerRequest playerPayload, Long createdAt, Long updatedAt) {
         this.email = playerPayload.getEmail();
         this.name = playerPayload.getName();
         this.role = playerPayload.getRole();
-        this.currentTeamName = playerPayload.getCurrentTeamName();
         this.jerseyNumber = playerPayload.getJerseyNumber();
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -100,12 +103,12 @@ public class Player {
         this.role = role;
     }
 
-    public String getCurrentTeamName() {
-        return currentTeamName;
+    public Team getTeam() {
+        return team;
     }
 
-    public void setCurrentTeamName(String currentTeamName) {
-        this.currentTeamName = currentTeamName;
+    public void setTeam(Team team) {
+        this.team = team;
     }
 
     public Integer getJerseyNumber() {
